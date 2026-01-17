@@ -4,6 +4,6 @@ services:
   app:
     build: .
     ports:
-      - "8080:80"
+      - "9194:80"
     container_name: cinepedido-frontend
     restart: unless-stopped
