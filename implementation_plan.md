@@ -21,5 +21,12 @@
 ## Phase 3: Deployment
 
 - **[NEW]** Create GitHub repository and push code.
+- [ ] Deploy to production (Convex).
 - Verify `npx convex dev` is running.
 - Ensure all environment variables are set if needed (mostly just the URL for the client).
+
+## Phase 4: Containerization
+
+- **[NEW]** Create `Dockerfile` (Nginx Alpine).
+- **[NEW]** Create `docker-compose.yml`.
+- **[NEW]** Update documentation with Docker commands.
