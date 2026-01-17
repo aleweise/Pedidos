@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Pedidos - CinePedido Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-play-circle"></i>
+                    <span>CinePedido</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="index.html">
+                            <i class="fas fa-chart-pie"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="users.html">
+                            <i class="fas fa-users"></i>
+                            <span>Clientes</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="orders.html">
+                            <i class="fas fa-film"></i>
+                            <span>Pedidos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="movies.html">
+                            <i class="fas fa-video"></i>
+                            <span>Películas</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="../index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Volver al sitio</span>
+                </a>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Cerrar sesión</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="page-title">
+                    <h1>Gestión de Pedidos</h1>
+                    <p>Administra las solicitudes de películas</p>
+                </div>
+                <div class="user-info">
+                    <span id="adminName">Administrador</span>
+                    <div class="avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <!-- Status Summary -->
+                <div class="status-summary">
+                    <button class="status-tab active" data-status="">
+                        <span class="count" id="countAll">0</span>
+                        <span class="label">Todos</span>
+                    </button>
+                    <button class="status-tab" data-status="pending">
+                        <span class="count" id="countPending">0</span>
+                        <span class="label">Pendientes</span>
+                    </button>
+                    <button class="status-tab" data-status="processing">
+                        <span class="count" id="countProcessing">0</span>
+                        <span class="label">En Proceso</span>
+                    </button>
+                    <button class="status-tab" data-status="completed">
+                        <span class="count" id="countCompleted">0</span>
+                        <span class="label">Completados</span>
+                    </button>
+                    <button class="status-tab" data-status="cancelled">
+                        <span class="count" id="countCancelled">0</span>
+                        <span class="label">Cancelados</span>
+                    </button>
+                </div>
+
+                <!-- Filters and Search -->
+                <div class="toolbar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Buscar película...">
+                    </div>
+                    <div class="filters">
+                        <select id="filterQuality" aria-label="Filtrar por calidad">
+                            <option value="">Todas las calidades</option>
+                            <option value="4k">4K</option>
+                            <option value="1080p">1080p</option>
+                            <option value="720p">720p</option>
+                        </select>
+                        <select id="filterAudio" aria-label="Filtrar por audio">
+                            <option value="">Todos los audios</option>
+                            <option value="latino">Latino</option>
+                            <option value="castellano">Castellano</option>
+                            <option value="original">Original</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Orders Table -->
+                <div class="card table-card">
+                    <div class="table-responsive">
+                        <table class="data-table" id="ordersTable">
+                            <thead>
+                                <tr>
+                                    <th>Película</th>
+                                    <th>Cliente</th>
+                                    <th>Calidad</th>
+                                    <th>Audio</th>
+                                    <th>Estado</th>
+                                    <th>Fecha</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTableBody">
+                                <tr>
+                                    <td colspan="7" class="loading-row">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        Cargando pedidos...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Order Detail Modal -->
+    <div class="modal" id="orderModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Detalle del Pedido</h3>
+                <button class="modal-close" id="closeModal" aria-label="Cerrar modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="order-detail">
+                    <div class="detail-row">
+                        <span class="label">Película:</span>
+                        <span class="value" id="orderMovie">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Año:</span>
+                        <span class="value" id="orderYear">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Cliente:</span>
+                        <span class="value" id="orderClient">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Calidad:</span>
+                        <span class="value" id="orderQuality">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Audio:</span>
+                        <span class="value" id="orderAudio">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Notas:</span>
+                        <span class="value" id="orderNotes">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Fecha de solicitud:</span>
+                        <span class="value" id="orderDate">-</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="orderStatus">Cambiar estado:</label>
+                    <select id="orderStatus">
+                        <option value="pending">Pendiente</option>
+                        <option value="processing">En Proceso</option>
+                        <option value="completed">Completado</option>
+                        <option value="cancelled">Cancelado</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="orderNotesInput">Agregar nota:</label>
+                    <textarea id="orderNotesInput" rows="3" placeholder="Notas adicionales..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" id="cancelModal">Cerrar</button>
+                <button type="button" class="btn-primary" id="saveOrder">Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-sm">
+            <div class="modal-header">
+                <h3>Confirmar eliminación</h3>
+                <button class="modal-close" id="closeDeleteModal" aria-label="Cerrar modal de eliminación">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar este pedido?</p>
+                <p class="text-muted">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" id="cancelDelete">Cancelar</button>
+                <button type="button" class="btn-danger" id="confirmDelete">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="orders.js"></script>
+</body>
+
+</html>

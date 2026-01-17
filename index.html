@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CinePedido - Películas a la Carta</title>
+    <meta name="description" content="Solicita tus películas favoritas en la mejor calidad.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <i class="fas fa-play-circle"></i> CinePedido
+            </div>
+            <div class="burger" id="burger">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#inicio">Inicio</a></li>
+                <li><a href="#tendencias">Tendencias</a></li>
+                <li><a href="#pedidos">Hacer Pedido</a></li>
+                <li><a href="login.html" class="btn-primary"><i class="fas fa-user"></i> Iniciar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section with Carousel -->
+        <section id="inicio" class="hero">
+            <div class="carousel-container">
+                <div class="carousel-track" id="carouselTrack">
+                    <!-- Carousel Items will be injected by JS or hardcoded for now -->
+                    <div class="carousel-item active hero-bg-1">
+                        <div class="content">
+                            <span class="tag">Más Pedida</span>
+                            <h1>Sin Novedad en el Frente</h1>
+                            <p>La conmovedora historia de un joven soldado alemán en el frente occidental durante la
+                                Primera Guerra Mundial.</p>
+                            <a href="#pedidos" class="btn-glass">Pedir Ahora</a>
+                        </div>
+                    </div>
+                    <div class="carousel-item hero-bg-2">
+                        <div class="content">
+                            <span class="tag">Acción</span>
+                            <h1>Top Gun: Maverick</h1>
+                            <p>Después de más de treinta años de servicio, Pete 'Maverick' Mitchell está donde
+                                pertenece.</p>
+                            <a href="#pedidos" class="btn-glass">Pedir Ahora</a>
+                        </div>
+                    </div>
+                    <div class="carousel-item hero-bg-3">
+                        <div class="content">
+                            <span class="tag">Superhéroes</span>
+                            <h1>Black Adam</h1>
+                            <p>Casi 5.000 años después de haber sido dotado de los poderes omnipotentes de los antiguos
+                                dioses.</p>
+                            <a href="#pedidos" class="btn-glass">Pedir Ahora</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-controls">
+                    <button id="prevBtn" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
+                    <button id="nextBtn" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Request Form Section -->
+        <section id="pedidos" class="request-section">
+            <div class="container">
+                <div class="form-container">
+                    <div class="form-header">
+                        <h2>¿Qué película deseas ver?</h2>
+                        <p>Completa el formulario y nosotros la buscamos por ti en la mejor calidad.</p>
+                    </div>
+                    <form id="movieForm" class="glass-form">
+                        <div class="input-group">
+                            <label for="movieName"><i class="fas fa-film"></i> Nombre de la Película</label>
+                            <input type="text" id="movieName" placeholder="Ej: Avatar 2" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="input-group">
+                                <label for="movieYear"><i class="fas fa-calendar-alt"></i> Año (Opcional)</label>
+                                <input type="number" id="movieYear" placeholder="2022" min="1900" max="2030">
+                            </div>
+                            <div class="input-group">
+                                <label for="quality"><i class="fas fa-tv"></i> Calidad</label>
+                                <select id="quality" required>
+                                    <option value="1080p">Full HD (1080p)</option>
+                                    <option value="4k">4K Ultra HD</option>
+                                    <option value="720p">HD (720p)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label class="label-audio"><i class="fas fa-volume-up"></i> Preferencia de Audio</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="audio" value="latino" checked>
+                                    <span class="custom-radio"></span>
+                                    Español Latino
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="audio" value="castellano">
+                                    <span class="custom-radio"></span>
+                                    Castellano
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="audio" value="original">
+                                    <span class="custom-radio"></span>
+                                    Original (Subtitulado)
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            <span>Enviar Solicitud</span>
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 CinePedido. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

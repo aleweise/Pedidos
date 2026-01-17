@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CinePedido Admin</title>
+    <meta name="description" content="Panel de administración de CinePedido">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-play-circle"></i>
+                    <span>CinePedido</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active">
+                        <a href="index.html">
+                            <i class="fas fa-chart-pie"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="users.html">
+                            <i class="fas fa-users"></i>
+                            <span>Clientes</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="orders.html">
+                            <i class="fas fa-film"></i>
+                            <span>Pedidos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="movies.html">
+                            <i class="fas fa-video"></i>
+                            <span>Películas</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="../index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Volver al sitio</span>
+                </a>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Cerrar sesión</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="page-title">
+                    <h1>Dashboard</h1>
+                    <p>Resumen general del sistema</p>
+                </div>
+                <div class="user-info">
+                    <span id="adminName">Administrador</span>
+                    <div class="avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-content">
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon users">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalUsers">0</h3>
+                            <p>Clientes Totales</p>
+                        </div>
+                        <div class="stat-trend up">
+                            <i class="fas fa-arrow-up"></i>
+                            <span id="newUsersWeek">0</span> esta semana
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon orders">
+                            <i class="fas fa-film"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalOrders">0</h3>
+                            <p>Pedidos Totales</p>
+                        </div>
+                        <div class="stat-trend up">
+                            <i class="fas fa-arrow-up"></i>
+                            <span id="newOrdersWeek">0</span> esta semana
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon pending">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="pendingOrders">0</h3>
+                            <p>Pedidos Pendientes</p>
+                        </div>
+                        <div class="stat-badge warning">Requieren atención</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon movies">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalMovies">0</h3>
+                            <p>Películas en Catálogo</p>
+                        </div>
+                        <div class="stat-trend neutral">
+                            <span id="availableMovies">0</span> disponibles
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts and Lists -->
+                <div class="dashboard-grid">
+                    <!-- Orders Chart -->
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h2>Pedidos por Día</h2>
+                            <span class="badge">Últimos 7 días</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" id="ordersChart">
+                                <!-- Chart bars will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Orders -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Pedidos Recientes</h2>
+                            <a href="orders.html" class="view-all">Ver todos</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="recent-orders" id="recentOrders">
+                                <div class="loading">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    Cargando...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Status Distribution -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Estado de Pedidos</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="status-distribution" id="statusDistribution">
+                                <!-- Status bars will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Acciones Rápidas</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="quick-actions">
+                                <a href="users.html" class="action-btn">
+                                    <i class="fas fa-user-plus"></i>
+                                    <span>Nuevo Cliente</span>
+                                </a>
+                                <a href="movies.html" class="action-btn">
+                                    <i class="fas fa-plus-circle"></i>
+                                    <span>Agregar Película</span>
+                                </a>
+                                <a href="orders.html?status=pending" class="action-btn">
+                                    <i class="fas fa-tasks"></i>
+                                    <span>Ver Pendientes</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="admin.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - CinePedido</title>
+    <meta name="description" content="Inicia sesión en CinePedido para solicitar tus películas favoritas.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="login.css">
+</head>
+
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+    </div>
+
+    <div class="login-container">
+        <!-- Left Side - Branding -->
+        <div class="login-branding">
+            <div class="brand-content">
+                <div class="logo">
+                    <i class="fas fa-play-circle"></i>
+                    <span>CinePedido</span>
+                </div>
+                <h1>Bienvenido de vuelta</h1>
+                <p>Accede a tu cuenta para solicitar las películas que más te gustan en la mejor calidad disponible.</p>
+
+                <div class="features">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-film"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h4>Miles de Películas</h4>
+                            <p>Catálogo extenso a tu disposición</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h4>Entrega Rápida</h4>
+                            <p>Recibe tus pedidos en minutos</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-gem"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h4>Calidad Premium</h4>
+                            <p>4K, HDR y audio de alta fidelidad</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Login Form -->
+        <div class="login-form-section">
+            <div class="login-card">
+                <div class="login-header">
+                    <h2>Iniciar Sesión</h2>
+                    <p>Ingresa tus credenciales para continuar</p>
+                </div>
+
+                <!-- Social Login Buttons -->
+                <div class="social-login">
+                    <button class="social-btn google" id="googleLogin">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="#4285F4"
+                                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                            <path fill="#34A853"
+                                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                            <path fill="#FBBC05"
+                                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                            <path fill="#EA4335"
+                                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                        </svg>
+                        <span>Continuar con Google</span>
+                    </button>
+
+                    <button class="social-btn facebook" id="facebookLogin">
+                        <i class="fab fa-facebook-f"></i>
+                        <span>Continuar con Facebook</span>
+                    </button>
+
+                    <button class="social-btn apple" id="appleLogin">
+                        <i class="fab fa-apple"></i>
+                        <span>Continuar con Apple</span>
+                    </button>
+
+                    <button class="social-btn twitter" id="twitterLogin">
+                        <i class="fab fa-x-twitter"></i>
+                        <span>Continuar con X</span>
+                    </button>
+                </div>
+
+                <div class="divider">
+                    <span>o continúa con email</span>
+                </div>
+
+                <!-- Email/Password Form -->
+                <form id="loginForm" class="email-form">
+                    <div class="input-group">
+                        <div class="input-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <input type="email" id="email" placeholder="correo@ejemplo.com" required>
+                    </div>
+
+                    <div class="input-group">
+                        <div class="input-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <input type="password" id="password" placeholder="Tu contraseña" required>
+                        <button type="button" class="toggle-password" id="togglePassword"
+                            aria-label="Mostrar contraseña">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox" id="rememberMe">
+                            <span class="checkmark"></span>
+                            Recordarme
+                        </label>
+                        <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+                    </div>
+
+                    <button type="submit" class="btn-submit">
+                        <span>Iniciar Sesión</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+
+                <div class="signup-prompt">
+                    <p>¿No tienes una cuenta? <a href="register.html">Regístrate gratis</a></p>
+                </div>
+
+                <div class="back-home">
+                    <a href="index.html">
+                        <i class="fas fa-arrow-left"></i>
+                        Volver al inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+
+</html>

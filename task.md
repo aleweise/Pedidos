@@ -1,0 +1,21 @@
+# Current Task: Connect Frontend to Convex Backend
+
+- [x] Create Convex Backend Functions (users, orders, movies, auth)
+- [x] Create Admin Panel UI
+- [x] Update Frontend Code to use Convex API
+  - [x] `login.js`
+  - [x] `register.js`
+  - [x] `admin/admin.js`
+  - [x] `admin/users.js`
+  - [x] `admin/orders.js`
+  - [x] `admin/movies.js`
+  - [x] `script.js`
+- [x] Get Deployment URL from User (Found local URL)
+- [x] Replace placeholder URL with Real URL in all files
+- [x] Test Connection
+- [x] Fix Accessibility Issues in `admin/movies.html`
+- [x] Fix Accessibility Issues in `admin/users.html`
+- [x] Fix Accessibility Issues in `admin/orders.html`
+- [x] Fix Accessibility Issues in `register.html`
+- [x] Refactor Inline Styles in `index.html`
+- [ ] Create GitHub Repository

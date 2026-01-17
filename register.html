@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Cuenta - CinePedido</title>
+    <meta name="description" content="Regístrate en CinePedido y accede a miles de películas en la mejor calidad.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="register.css">
+</head>
+
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+    </div>
+
+    <div class="register-container">
+        <!-- Left Side - Branding -->
+        <div class="register-branding">
+            <div class="brand-content">
+                <div class="logo">
+                    <i class="fas fa-play-circle"></i>
+                    <span>CinePedido</span>
+                </div>
+                <h1>Únete a la comunidad</h1>
+                <p>Crea tu cuenta gratuita y comienza a solicitar las películas que siempre quisiste ver.</p>
+
+                <div class="benefits">
+                    <div class="benefit-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Sin costo de registro</span>
+                    </div>
+                    <div class="benefit-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Acceso a catálogo completo</span>
+                    </div>
+                    <div class="benefit-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Pedidos ilimitados</span>
+                    </div>
+                    <div class="benefit-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Notificaciones de nuevos lanzamientos</span>
+                    </div>
+                    <div class="benefit-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Historial de tus solicitudes</span>
+                    </div>
+                </div>
+
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <p>"La mejor plataforma para encontrar películas en alta calidad. El servicio es increíble."</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="author-info">
+                            <strong>María García</strong>
+                            <span>Usuario Premium</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Register Form -->
+        <div class="register-form-section">
+            <div class="register-card">
+                <div class="register-header">
+                    <h2>Crear Cuenta</h2>
+                    <p>Completa tus datos para comenzar</p>
+                </div>
+
+                <!-- Social Register Buttons -->
+                <div class="social-register">
+                    <button class="social-btn google" id="googleRegister">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="#4285F4"
+                                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                            <path fill="#34A853"
+                                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                            <path fill="#FBBC05"
+                                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                            <path fill="#EA4335"
+                                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                        </svg>
+                        <span>Registrarse con Google</span>
+                    </button>
+
+                    <div class="social-row">
+                        <button class="social-btn facebook" id="facebookRegister" aria-label="Registrarse con Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </button>
+                        <button class="social-btn apple" id="appleRegister" aria-label="Registrarse con Apple">
+                            <i class="fab fa-apple"></i>
+                        </button>
+                        <button class="social-btn twitter" id="twitterRegister" aria-label="Registrarse con Twitter">
+                            <i class="fab fa-x-twitter"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="divider">
+                    <span>o regístrate con email</span>
+                </div>
+
+                <!-- Registration Form -->
+                <form id="registerForm" class="register-form">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <div class="input-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <input type="text" id="firstName" placeholder="Nombre" required>
+                        </div>
+                        <div class="input-group">
+                            <div class="input-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <input type="text" id="lastName" placeholder="Apellido" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <div class="input-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <input type="email" id="email" placeholder="correo@ejemplo.com" required>
+                    </div>
+
+                    <div class="input-group">
+                        <div class="input-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <input type="password" id="password" placeholder="Crear contraseña" required>
+                        <button type="button" class="toggle-password" id="togglePassword"
+                            aria-label="Mostrar contraseña">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+
+                    <!-- Password Strength Indicator -->
+                    <div class="password-strength" id="passwordStrength">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strengthFill"></div>
+                        </div>
+                        <span class="strength-text" id="strengthText">Fortaleza de contraseña</span>
+                    </div>
+
+                    <div class="input-group">
+                        <div class="input-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <input type="password" id="confirmPassword" placeholder="Confirmar contraseña" required>
+                        <button type="button" class="toggle-password" id="toggleConfirmPassword"
+                            aria-label="Mostrar contraseña">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+
+                    <div class="terms-checkbox">
+                        <label class="checkbox-option">
+                            <input type="checkbox" id="termsAccepted" required>
+                            <span class="checkmark"></span>
+                            <span class="checkbox-text">
+                                Acepto los <a href="#" class="link">Términos de Servicio</a> y la <a href="#"
+                                    class="link">Política de Privacidad</a>
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="newsletter-checkbox">
+                        <label class="checkbox-option">
+                            <input type="checkbox" id="newsletter">
+                            <span class="checkmark"></span>
+                            <span class="checkbox-text">
+                                Quiero recibir novedades y promociones
+                            </span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-submit">
+                        <span>Crear mi cuenta</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+
+                <div class="login-prompt">
+                    <p>¿Ya tienes una cuenta? <a href="login.html">Iniciar sesión</a></p>
+                </div>
+
+                <div class="back-home">
+                    <a href="index.html">
+                        <i class="fas fa-arrow-left"></i>
+                        Volver al inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="register.js"></script>
+</body>
+
+</html>

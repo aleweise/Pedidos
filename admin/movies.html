@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Películas - CinePedido Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-play-circle"></i>
+                    <span>CinePedido</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="index.html">
+                            <i class="fas fa-chart-pie"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="users.html">
+                            <i class="fas fa-users"></i>
+                            <span>Clientes</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="orders.html">
+                            <i class="fas fa-film"></i>
+                            <span>Pedidos</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="movies.html">
+                            <i class="fas fa-video"></i>
+                            <span>Películas</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="../index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Volver al sitio</span>
+                </a>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Cerrar sesión</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="page-title">
+                    <h1>Catálogo de Películas</h1>
+                    <p>Gestiona el catálogo disponible</p>
+                </div>
+                <div class="user-info">
+                    <span id="adminName">Administrador</span>
+                    <div class="avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <!-- Filters and Actions -->
+                <div class="toolbar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Buscar película...">
+                    </div>
+                    <div class="filters">
+                        <select id="filterGenre" aria-label="Filtrar por género">
+                            <option value="">Todos los géneros</option>
+                        </select>
+                        <select id="filterAvailability" aria-label="Filtrar por disponibilidad">
+                            <option value="">Todos</option>
+                            <option value="true">Disponibles</option>
+                            <option value="false">No disponibles</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary" id="addMovieBtn">
+                        <i class="fas fa-plus"></i>
+                        Agregar Película
+                    </button>
+                </div>
+
+                <!-- Movies Grid -->
+                <div class="movies-grid" id="moviesGrid">
+                    <div class="loading-placeholder">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Cargando películas...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Movie Modal -->
+    <div class="modal" id="movieModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Nueva Película</h3>
+                <button class="modal-close" id="closeModal" aria-label="Cerrar modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="movieForm">
+                <div class="modal-body">
+                    <input type="hidden" id="movieId">
+
+                    <div class="form-group">
+                        <label for="movieTitle">Título</label>
+                        <input type="text" id="movieTitle" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="movieYear">Año</label>
+                            <input type="number" id="movieYear" min="1900" max="2030" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="movieGenre">Género</label>
+                            <input type="text" id="movieGenre" placeholder="Ej: Acción, Drama" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="movieImage">URL de imagen</label>
+                        <input type="url" id="movieImage" placeholder="https://...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Calidades disponibles</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-option">
+                                <input type="checkbox" name="quality" value="720p">
+                                <span>720p</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" name="quality" value="1080p">
+                                <span>1080p</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" name="quality" value="4k">
+                                <span>4K</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-option toggle">
+                            <input type="checkbox" id="movieAvailable" checked>
+                            <span class="toggle-slider"></span>
+                            <span>Disponible</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="cancelModal">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-sm">
+            <div class="modal-header">
+                <h3>Confirmar eliminación</h3>
+                <button class="modal-close" id="closeDeleteModal" aria-label="Cerrar modal de eliminación">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar <strong id="deleteMovieTitle"></strong>?</p>
+                <p class="text-muted">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" id="cancelDelete">Cancelar</button>
+                <button type="button" class="btn-danger" id="confirmDelete">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="movies.js"></script>
+</body>
+
+</html>
