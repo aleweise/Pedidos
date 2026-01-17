@@ -20,5 +20,6 @@
 
 ## Phase 3: Deployment
 
+- **[NEW]** Create GitHub repository and push code.
 - Verify `npx convex dev` is running.
 - Ensure all environment variables are set if needed (mostly just the URL for the client).
