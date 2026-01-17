@@ -19,3 +19,4 @@
 - [x] Fix Accessibility Issues in `register.html`
 - [x] Refactor Inline Styles in `index.html`
 - [ ] Create GitHub Repository
+- [ ] Create README.md
