@@ -55,6 +55,19 @@ Sigue estos pasos para correr el proyecto localmente:
 4. **Ejecutar:**
     Abre `index.html` en tu navegador o usa una extensión como *Live Server*.
 
+## 🐳 Docker
+
+También puedes ejecutar la aplicación usando Docker:
+
+1. **Construir y levantar el contenedor:**
+
+    ```bash
+    docker-compose up -d --build
+    ```
+
+2. **Acceder a la aplicación:**
+    Abre tu navegador en [http://localhost:8080](http://localhost:8080).
+
 ## 📄 Licencia
 
 Distribuido bajo la licencia MIT.
