@@ -20,6 +20,6 @@
 - [x] Refactor Inline Styles in `index.html`
 - [ ] Create GitHub Repository
 - [x] Create README.md
-- [ ] Create Dockerfile
-- [ ] Create docker-compose.yml
-- [ ] Update README with Docker instructions
+- [x] Create Dockerfile
+- [x] Create docker-compose.yml
+- [x] Update README with Docker instructions

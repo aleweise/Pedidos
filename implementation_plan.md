@@ -27,6 +27,6 @@
 
 ## Phase 4: Containerization
 
-- **[NEW]** Create `Dockerfile` (Nginx Alpine).
-- **[NEW]** Create `docker-compose.yml`.
-- **[NEW]** Update documentation with Docker commands.
+- **[DONE]** Create `Dockerfile` (Nginx Alpine).
+- **[DONE]** Create `docker-compose.yml`.
+- **[DONE]** Update documentation with Docker commands.
