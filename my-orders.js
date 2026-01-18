@@ -9,10 +9,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     const tableBody = document.getElementById('ordersTableBody');
 
     try {
+        // Verify Supabase Session first
+        const { data: { session }, error: authError } = await supabase.auth.getSession();
+
+        if (authError || !session) {
+            console.warn('No active Supabase session found', authError);
+            // If we have local storage but no Supabase session, try to sign out and clear to avoid confusion
+            /* Optional: could force re-login here, but let's just show error for now */
+            throw new Error('Sesión no válida. Por favor recarga o inicia sesión nuevamente.');
+        }
+
         // Fetch orders for current user
+        // We explicitly filter by user_id to be safe, though RLS should handle it.
         const { data: orders, error } = await supabase
             .from('orders')
             .select('*')
+            .eq('user_id', session.user.id) // Explicit check useful for debugging
             .order('created_at', { ascending: false });
 
         if (error) throw error;
@@ -25,7 +37,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             <tr>
                 <td colspan="6" class="empty-state">
                     <i class="fas fa-exclamation-circle" style="color: #ef4444;"></i>
-                    <p>Error al cargar los pedidos. Por favor intenta más tarde.</p>
+                    <p>Error al cargar los pedidos.</p>
+                    <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 5px;">
+                        ${escapeHtml(error.message || JSON.stringify(error))}
+                    </p>
                 </td>
             </tr>
         `;

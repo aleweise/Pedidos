@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - CinePedido</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="../login.css"> <!-- Import login specific styles -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Specific overrides for Admin Login */
+        body {
+            /* Ensure background is covered */
+            background-color: #0f172a;
+            min-height: 100vh;
+        }
+
+        .login-container {
+            /* Admin specific border/glow */
+            border: 1px solid rgba(244, 114, 182, 0.3) !important;
+            box-shadow: 0 0 40px rgba(244, 114, 182, 0.15) !important;
+            max-width: 450px;
+            /* Force compact width for admin */
+            margin: 0 auto;
+            /* Reset login.css flexible layout if needed */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Hide the left side branding if login.css tries to split it */
+        .login-branding {
+            display: none !important;
+        }
+
+        .login-form-section {
+            width: 100% !important;
+            padding: 2rem !important;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%) !important;
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 6px 20px rgba(236, 72, 153, 0.6);
+        }
+
+        .admin-badge {
+            background: rgba(236, 72, 153, 0.15);
+            color: #f472b6;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            border: 1px solid rgba(244, 114, 182, 0.2);
+        }
+
+        .forgot-pass-link {
+            text-align: right;
+            margin-top: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .forgot-pass-link a {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .forgot-pass-link a:hover {
+            color: #f472b6;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-animation">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+    </div>
+
+    <div class="auth-wrapper"
+        style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem;">
+        <div class="glass-card login-container">
+            <div class="text-center" style="margin-bottom: 2rem;">
+                <span class="admin-badge"><i class="fas fa-shield-alt"></i> ADMIN PANEL</span>
+                <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Bienvenido</h2>
+                <p style="color: #94a3b8;">Acceso seguro para administradores</p>
+            </div>
+
+            <form id="adminLoginForm">
+                <div class="input-group">
+                    <label for="email" style="margin-bottom: 0.5rem; display: block; color: #e2e8f0;"><i
+                            class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="email" placeholder="admin@cinepedido.com" required
+                        style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white;">
+                </div>
+
+                <div class="input-group" style="margin-top: 1.5rem;">
+                    <label for="password" style="margin-bottom: 0.5rem; display: block; color: #e2e8f0;"><i
+                            class="fas fa-lock"></i> Contraseña</label>
+                    <div class="password-wrapper" style="position: relative;">
+                        <input type="password" id="password" placeholder="••••••••" required
+                            style="width: 100%; padding: 12px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white;">
+                        <i class="fas fa-eye toggle-password"
+                            style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94a3b8;"></i>
+                    </div>
+                </div>
+
+                <div class="forgot-pass-link">
+                    <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+                </div>
+
+                <button type="submit" class="btn-primary"
+                    style="width: 100%; padding: 12px; border-radius: 8px; border: none; color: white; font-weight: 600; cursor: pointer; font-size: 1rem;">
+                    Entrar al Panel <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+                </button>
+            </form>
+
+
+            <div id="errorMessage" class="error-message"
+                style="display: none; margin-top: 1rem; color: #ef4444; text-align: center;"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../utils/supabaseClient.js"></script>
+    <script src="login.js"></script>
+</body>
+
+</html>

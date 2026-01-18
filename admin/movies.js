@@ -3,7 +3,28 @@
 let movies = [];
 let currentMovieId = null;
 
-document.addEventListener('DOMContentLoaded', () => {
+// ===== Strict Admin Auth Check =====
+async function checkAdminAuth() {
+    try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error || !session) throw new Error('No session');
+
+        const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
+
+        if (profileError || profile?.role !== 'admin') {
+            throw new Error('Unauthorized');
+        }
+    } catch (e) {
+        window.location.href = 'login.html';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await checkAdminAuth();
     initSidebar();
     initLogout();
     initEventListeners();
@@ -21,7 +42,7 @@ function initLogout() {
     document.getElementById('logoutBtn')?.addEventListener('click', async () => {
         await supabase.auth.signOut();
         localStorage.clear();
-        window.location.href = '../login.html';
+        window.location.href = 'login.html';
     });
 }
 

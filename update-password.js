@@ -43,15 +43,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         submitBtn.disabled = true;
 
         try {
-            const { error } = await supabase.auth.updateUser({ password: password });
+            const { data: { user }, error } = await supabase.auth.updateUser({ password: password });
 
             if (error) throw error;
 
             showMessage('¡Contraseña actualizada correctamente!', 'success');
 
-            setTimeout(() => {
-                window.location.href = 'login.html';
-            }, 2000);
+            // Determine redirect based on role
+            setTimeout(async () => {
+                try {
+                    // Check if admin
+                    const { data: profile } = await supabase
+                        .from('profiles')
+                        .select('role')
+                        .eq('id', user.id)
+                        .single();
+
+                    if (profile && profile.role === 'admin') {
+                        window.location.href = 'admin/login.html';
+                    } else {
+                        window.location.href = 'login.html';
+                    }
+                } catch (err) {
+                    // Fallback to normal login
+                    window.location.href = 'login.html';
+                }
+            }, 1000);
 
         } catch (error) {
             showMessage(error.message || 'Error al actualizar la contraseña', 'error');

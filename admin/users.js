@@ -4,12 +4,35 @@ let users = [];
 let currentUserId = null;
 
 // ===== Initialize =====
-document.addEventListener('DOMContentLoaded', () => {
+// ===== Initialize =====
+document.addEventListener('DOMContentLoaded', async () => {
+    await checkAdminAuth(); // Check auth FIRST
     initSidebar();
     initLogout();
     initEventListeners();
     fetchAndRenderUsers();
 });
+
+// ===== Strict Admin Auth Check =====
+async function checkAdminAuth() {
+    try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error || !session) throw new Error('No session');
+
+        const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
+
+        if (profileError || profile?.role !== 'admin') {
+            throw new Error('Unauthorized');
+        }
+    } catch (e) {
+        console.warn('Redirecting to admin login', e);
+        window.location.href = 'login.html'; // Redirect to ADMIN login
+    }
+}
 
 function initSidebar() {
     document.getElementById('sidebarToggle')?.addEventListener('click', () => {
@@ -21,7 +44,7 @@ function initLogout() {
     document.getElementById('logoutBtn')?.addEventListener('click', async () => {
         await supabase.auth.signOut();
         localStorage.clear();
-        window.location.href = '../login.html';
+        window.location.href = 'login.html'; // Redirect to ADMIN login
     });
 }
 

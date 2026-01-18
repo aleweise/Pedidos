@@ -16,34 +16,38 @@ function initSidebar() {
 }
 
 // ===== Auth Check =====
-async function checkAuth() {
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-        window.location.href = '../login.html';
-        return;
-    }
-
+async function checkAdminAuth() {
     try {
-        // Verify role
-        const { data: profile, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single();
+        const { data: { session }, error } = await supabase.auth.getSession();
 
-        if (error || !profile || profile.role !== 'admin') {
-            alert('Acceso no autorizado');
-            await supabase.auth.signOut();
-            window.location.href = '../index.html';
+        if (error || !session) {
+            window.location.href = 'login.html'; // Redirect to Admin Login
             return;
         }
 
-        const adminName = document.getElementById('adminName');
-        if (adminName) adminName.textContent = profile.name || 'Administrador';
-    } catch (err) {
-        console.error('Auth verification failed', err);
-        window.location.href = '../login.html';
+        // Check if user is actually an admin
+        const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
+
+        if (profileError || profile?.role !== 'admin') {
+            console.warn('Unauthorized access attempt');
+            await supabase.auth.signOut();
+            window.location.href = 'login.html?error=unauthorized';
+            return;
+        }
+
+        // Valid Admin
+        const userEmail = session.user.email;
+        document.getElementById('adminName').textContent = 'Admin';
+        const adminEmailElement = document.getElementById('adminEmail');
+        if (adminEmailElement) adminEmailElement.textContent = userEmail;
+
+    } catch (error) {
+        console.error('Auth check error:', error);
+        window.location.href = 'login.html';
     }
 }
 
