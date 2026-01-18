@@ -22,4 +22,6 @@
 - [x] Create README.md
 - [x] Create Dockerfile
 - [x] Create docker-compose.yml
+- [x] Create docker-compose.yml
 - [x] Update README with Docker instructions
+- [x] Debug Order Visibility Issue (Admin Dashboard crash & Client ID check)

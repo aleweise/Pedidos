@@ -4,7 +4,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
     initSidebar();
     initLogout();
-    await checkAuth();
+    await checkAdminAuth();
     await loadDashboardData();
 });
 

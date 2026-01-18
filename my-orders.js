@@ -29,6 +29,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (error) throw error;
 
+        // Show user email
+        const emailDisplay = document.getElementById('userEmailDisplay');
+        if (emailDisplay && session.user.email) {
+            emailDisplay.textContent = session.user.email;
+        }
+
         renderOrders(orders);
 
     } catch (error) {
