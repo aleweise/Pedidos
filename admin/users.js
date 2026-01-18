@@ -1,35 +1,7 @@
-// Convex HTTP Client Helper
-async function convexAction(action, path, args = {}) {
-    const CONVEX_URL = 'http://127.0.0.1:3210';
-    try {
-        const response = await fetch(`${CONVEX_URL}/api/${action}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ path, args }),
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Error en el servidor');
-        }
-
-        const data = await response.json();
-        if (data.status === 'error') {
-            throw new Error(data.errorMessage);
-        }
-        return data.value;
-    } catch (error) {
-        console.error('Convex Error:', error);
-        throw error;
-    }
-}
+// ===== Users Management JavaScript =====
 
 let users = [];
 let currentUserId = null;
-
-// ... DOM Elements (kept same) ...
 
 // ===== Initialize =====
 document.addEventListener('DOMContentLoaded', () => {
@@ -39,28 +11,53 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchAndRenderUsers();
 });
 
-// ... Sidebar/Logout (kept same) ...
+function initSidebar() {
+    document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+        document.getElementById('sidebar')?.classList.toggle('open');
+    });
+}
+
+function initLogout() {
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+        await supabase.auth.signOut();
+        localStorage.clear();
+        window.location.href = '../login.html';
+    });
+}
 
 async function fetchAndRenderUsers() {
     try {
-        const search = elements.searchInput?.value?.trim();
-        const role = elements.filterRole?.value || undefined;
+        const search = document.getElementById('searchInput')?.value?.trim();
+        const role = document.getElementById('filterRole')?.value || undefined;
         let isActive = undefined;
-        if (elements.filterStatus?.value !== '') {
-            isActive = elements.filterStatus?.value === 'true';
+        const statusVal = document.getElementById('filterStatus')?.value;
+        if (statusVal !== '') {
+            isActive = statusVal === 'true';
         }
 
-        // Call users:list query
-        users = await convexAction('query', 'users:list', {
-            search: search || undefined,
-            role: role,
-            isActive: isActive
-        });
+        let query = supabase.from('profiles').select('*');
+
+        if (role) query = query.eq('role', role);
+        if (isActive !== undefined) query = query.eq('is_active', isActive);
+
+        if (search) {
+            query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%`);
+        }
+
+        const { data, error } = await query.order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        users = data.map(u => ({
+            ...u,
+            isActive: u.is_active,
+            createdAt: u.created_at
+        }));
 
         renderUsers(users);
     } catch (error) {
         console.error('Error fetching users:', error);
-        elements.usersTableBody.innerHTML = `
+        document.getElementById('usersTableBody').innerHTML = `
             <tr>
                 <td colspan="7" class="loading-row error-text">
                     <i class="fas fa-exclamation-circle"></i>
@@ -73,33 +70,35 @@ async function fetchAndRenderUsers() {
 
 // ===== Event Listeners =====
 function initEventListeners() {
-    // Search and filters - Update to call fetchAndRenderUsers
-    elements.searchInput?.addEventListener('input', debounce(fetchAndRenderUsers, 500));
-    elements.filterRole?.addEventListener('change', fetchAndRenderUsers);
-    elements.filterStatus?.addEventListener('change', fetchAndRenderUsers);
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce(fetchAndRenderUsers, 500));
+    }
+
+    document.getElementById('filterRole')?.addEventListener('change', fetchAndRenderUsers);
+    document.getElementById('filterStatus')?.addEventListener('change', fetchAndRenderUsers);
 
     // Add user button
-    elements.addUserBtn?.addEventListener('click', () => openUserModal());
+    document.getElementById('addUserBtn')?.addEventListener('click', () => openUserModal());
 
     // Modal controls
-    elements.closeModal?.addEventListener('click', closeUserModal);
-    elements.cancelModal?.addEventListener('click', closeUserModal);
-    elements.userModal?.querySelector('.modal-backdrop')?.addEventListener('click', closeUserModal);
+    document.getElementById('closeModal')?.addEventListener('click', closeUserModal);
+    document.getElementById('cancelModal')?.addEventListener('click', closeUserModal);
 
     // Delete modal controls
-    elements.closeDeleteModal?.addEventListener('click', closeDeleteModal);
-    elements.cancelDelete?.addEventListener('click', closeDeleteModal);
-    elements.deleteModal?.querySelector('.modal-backdrop')?.addEventListener('click', closeDeleteModal);
-    elements.confirmDelete?.addEventListener('click', confirmDeleteUser);
+    document.getElementById('closeDeleteModal')?.addEventListener('click', closeDeleteModal);
+    document.getElementById('cancelDelete')?.addEventListener('click', closeDeleteModal);
+    document.getElementById('confirmDelete')?.addEventListener('click', confirmDeleteUser);
 
     // Form submit
-    elements.userForm?.addEventListener('submit', handleUserSubmit);
+    document.getElementById('userForm')?.addEventListener('submit', handleUserSubmit);
 }
 
 // ===== Render Users Table =====
 function renderUsers(usersToRender) {
+    const tbody = document.getElementById('usersTableBody');
     if (!usersToRender || usersToRender.length === 0) {
-        elements.usersTableBody.innerHTML = `
+        tbody.innerHTML = `
             <tr>
                 <td colspan="7" class="loading-row">
                     <i class="fas fa-users"></i>
@@ -110,14 +109,14 @@ function renderUsers(usersToRender) {
         return;
     }
 
-    elements.usersTableBody.innerHTML = usersToRender.map(user => `
+    tbody.innerHTML = usersToRender.map(user => `
         <tr>
             <td>
                 <div class="user-cell">
                     <div class="avatar-sm">
-                        ${getInitials(user.name)}
+                        ${getInitials(user.name || 'U')}
                     </div>
-                    <span>${escapeHtml(user.name)}</span>
+                    <span>${escapeHtml(user.name || 'Sin nombre')}</span>
                 </div>
             </td>
             <td>${escapeHtml(user.email)}</td>
@@ -150,6 +149,42 @@ function renderUsers(usersToRender) {
     `).join('');
 }
 
+// Expose functions to window
+window.openUserModal = function (id = null) {
+    currentUserId = id;
+    const modal = document.getElementById('userModal');
+    const form = document.getElementById('userForm');
+
+    if (id) {
+        const user = users.find(u => u.id === id);
+        if (!user) return;
+
+        document.getElementById('modalTitle').textContent = 'Editar Usuario';
+        document.getElementById('userName').value = user.name || '';
+        document.getElementById('userEmail').value = user.email || '';
+        document.getElementById('userPhone').value = user.phone || '';
+        document.getElementById('userRole').value = user.role;
+        document.getElementById('userPassword').parentElement.style.display = 'none'; // Hide password for edit
+        document.getElementById('userEmail').disabled = true; // Cannot change email easily
+
+    } else {
+        document.getElementById('modalTitle').textContent = 'Nuevo Usuario';
+        form.reset();
+        document.getElementById('userPassword').parentElement.style.display = 'block';
+        document.getElementById('userEmail').disabled = false;
+
+        // Show warning about creation
+        showNotification('Nota: Crear usuarios desde aquí no está soportado completamente en esta versión.', 'info');
+    }
+
+    modal.classList.add('show');
+};
+
+window.closeUserModal = function () {
+    document.getElementById('userModal').classList.remove('show');
+    currentUserId = null;
+};
+
 
 // ===== Handle User Submit =====
 async function handleUserSubmit(e) {
@@ -157,38 +192,29 @@ async function handleUserSubmit(e) {
 
     const formData = {
         name: document.getElementById('userName').value.trim(),
-        email: document.getElementById('userEmail').value.trim().toLowerCase(),
-        phone: document.getElementById('userPhone').value.trim(),
         role: document.getElementById('userRole').value,
-        password: document.getElementById('userPassword').value,
+        phone: document.getElementById('userPhone').value.trim(),
     };
 
     try {
         if (currentUserId) {
             // Update existing user
-            await convexAction('mutation', 'users:update', {
-                userId: currentUserId,
-                name: formData.name,
-                email: formData.email,
-                phone: formData.phone || undefined,
-                role: formData.role
-            });
+            const { error } = await supabase
+                .from('profiles')
+                .update({
+                    name: formData.name,
+                    role: formData.role,
+                    // phone is not in our simple profiles schema, but we can ignore or add it if needed. 
+                    // For now let's assume profiles has no phone column or ignored.
+                })
+                .eq('id', currentUserId);
+
+            if (error) throw error;
             showNotification('Usuario actualizado correctamente', 'success');
         } else {
-            // Create new user (using the create mutation in users.ts)
-            if (!formData.password || formData.password.length < 6) {
-                showNotification('La contraseña debe tener al menos 6 caracteres', 'error');
-                return;
-            }
-
-            await convexAction('mutation', 'users:create', {
-                email: formData.email,
-                name: formData.name,
-                password: formData.password,
-                role: formData.role,
-                phone: formData.phone || undefined
-            });
-            showNotification('Usuario creado correctamente', 'success');
+            // Create new user
+            showNotification('La creación de usuarios requiere registro por parte del usuario.', 'error');
+            return;
         }
 
         closeUserModal();
@@ -201,7 +227,16 @@ async function handleUserSubmit(e) {
 // ===== Toggle User Status =====
 window.toggleUserStatus = async function (userId) {
     try {
-        await convexAction('mutation', 'users:toggleActive', { userId });
+        const user = users.find(u => u.id === userId);
+        if (!user) return;
+
+        const { error } = await supabase
+            .from('profiles')
+            .update({ is_active: !user.isActive })
+            .eq('id', userId);
+
+        if (error) throw error;
+
         showNotification('Estado del usuario actualizado', 'success');
         fetchAndRenderUsers();
     } catch (error) {
@@ -209,23 +244,27 @@ window.toggleUserStatus = async function (userId) {
     }
 };
 
-// ... Delete Modal Open/Close (kept same) ...
+window.openDeleteModal = function (id) {
+    currentUserId = id;
+    document.getElementById('deleteModal').classList.add('show');
+};
+
+window.closeDeleteModal = function () {
+    document.getElementById('deleteModal').classList.remove('show');
+    currentUserId = null;
+};
 
 async function confirmDeleteUser() {
     if (currentUserId) {
-        try {
-            await convexAction('mutation', 'users:remove', { userId: currentUserId });
-            showNotification('Usuario eliminado correctamente', 'success');
-            closeDeleteModal();
-            fetchAndRenderUsers();
-        } catch (error) {
-            showNotification('Error al eliminar usuario', 'error');
-        }
+        showNotification('La eliminación de usuarios no está soportada desde el panel. Desactiva el usuario en su lugar.', 'info');
+        closeDeleteModal();
     }
 }
 
+
 // ===== Helpers =====
 function getInitials(name) {
+    if (!name) return 'U';
     return name
         .split(' ')
         .map(n => n[0])
@@ -235,6 +274,7 @@ function getInitials(name) {
 }
 
 function formatDate(timestamp) {
+    if (!timestamp) return '-';
     return new Date(timestamp).toLocaleDateString('es-ES', {
         day: '2-digit',
         month: 'short',
@@ -243,6 +283,7 @@ function formatDate(timestamp) {
 }
 
 function escapeHtml(text) {
+    if (!text) return '';
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
@@ -280,19 +321,9 @@ function showNotification(message, type = 'info') {
     `;
 
     Object.assign(notification.style, {
-        position: 'fixed',
-        top: '20px',
-        right: '20px',
-        padding: '1rem 1.5rem',
-        borderRadius: '12px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.75rem',
-        fontSize: '0.95rem',
-        fontWeight: '500',
-        zIndex: '9999',
-        animation: 'slideIn 0.3s ease',
-        backdropFilter: 'blur(10px)'
+        position: 'fixed', top: '20px', right: '20px', padding: '1rem 1.5rem', borderRadius: '12px',
+        background: type === 'success' ? 'rgba(16, 185, 129, 0.9)' : type === 'error' ? 'rgba(239, 68, 68, 0.9)' : 'rgba(99, 102, 241, 0.9)',
+        color: 'white', zIndex: '9999', display: 'flex', alignItems: 'center', gap: '0.75rem'
     });
 
     const colors = {
@@ -307,11 +338,7 @@ function showNotification(message, type = 'info') {
     notification.style.color = 'white';
 
     document.body.appendChild(notification);
-
-    setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease forwards';
-        setTimeout(() => notification.remove(), 300);
-    }, 4000);
+    setTimeout(() => { notification.remove(); }, 4000);
 }
 
 // Add animation keyframes

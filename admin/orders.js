@@ -1,33 +1,5 @@
 // ===== Orders Management JavaScript =====
 
-// Convex HTTP Client Helper
-async function convexAction(action, path, args = {}) {
-    const CONVEX_URL = 'http://127.0.0.1:3210';
-    try {
-        const response = await fetch(`${CONVEX_URL}/api/${action}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ path, args }),
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Error en el servidor');
-        }
-
-        const data = await response.json();
-        if (data.status === 'error') {
-            throw new Error(data.errorMessage);
-        }
-        return data.value;
-    } catch (error) {
-        console.error('Convex Error:', error);
-        throw error;
-    }
-}
-
 let orders = [];
 let currentOrderId = null;
 let currentStatusFilter = '';
@@ -46,7 +18,8 @@ function initSidebar() {
 }
 
 function initLogout() {
-    document.getElementById('logoutBtn')?.addEventListener('click', () => {
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+        await supabase.auth.signOut();
         localStorage.clear();
         window.location.href = '../login.html';
     });
@@ -57,20 +30,31 @@ async function fetchAndRenderOrders() {
         const search = document.getElementById('searchInput')?.value?.trim();
         const status = currentStatusFilter || undefined;
 
-        // Fetch orders from Convex
-        // Using 'orders:list' locally filters by status if provided, or we can fetch all and filter client side.
-        // Given the UI requires counts for ALL statuses to be visible, it's better to fetch ALL orders
-        // and do client-side filtering + counting, unless the dataset is huge.
-        // For this app, fetching all is fine.
+        // Fetch orders from Supabase, including (user) profile data
+        let query = supabase
+            .from('orders')
+            .select('*, profiles(name, email)');
 
-        orders = await convexAction('query', 'orders:list', {});
+        const { data, error } = await query;
+
+        if (error) throw error;
+
+        // Map Supabase data to expected format
+        orders = data.map(o => ({
+            ...o,
+            user: o.profiles || { name: 'Desconocido', email: '' },
+            movieName: o.movie_name,
+            movieYear: o.movie_year,
+            // quality matches
+            audioPreference: o.audio_preference,
+            createdAt: o.created_at
+        }));
 
         updateCounts(); // Update counts based on all orders
         renderOrders(); // Render based on current filters
     } catch (error) {
         console.error('Error loading orders:', error);
         showNotification('Error cargando pedidos', 'error');
-        // Fallback or empty state
         document.getElementById('ordersTableBody').innerHTML = '<tr><td colspan="7" class="loading-row error-text">Error de conexión</td></tr>';
     }
 }
@@ -109,7 +93,7 @@ function updateCounts() {
 function renderOrders() {
     let filtered = [...orders];
 
-    // Apply filters locally
+    // Apply filters locally (since we fetched all)
     if (currentStatusFilter) filtered = filtered.filter(o => o.status === currentStatusFilter);
 
     const search = document.getElementById('searchInput')?.value?.toLowerCase() || '';
@@ -121,7 +105,7 @@ function renderOrders() {
     const audio = document.getElementById('filterAudio')?.value;
     if (audio) filtered = filtered.filter(o => o.audioPreference === audio);
 
-    filtered.sort((a, b) => b.createdAt - a.createdAt);
+    filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     const tbody = document.getElementById('ordersTableBody');
     if (filtered.length === 0) {
@@ -136,7 +120,7 @@ function renderOrders() {
             <td>${o.quality.toUpperCase()}</td>
             <td>${o.audioPreference}</td>
             <td><span class="order-status ${o.status}">${getStatusLabel(o.status)}</span></td>
-            <td>${formatTime(o.createdAt)}</td>
+            <td>${formatTime(new Date(o.createdAt).getTime())}</td>
             <td>
                 <div class="action-buttons">
                     <button class="btn-icon view" onclick="openOrderModal('${o.id}')"><i class="fas fa-eye"></i></button>
@@ -164,7 +148,10 @@ window.openOrderModal = function (id) {
     document.getElementById('orderModal').classList.add('show');
 };
 
-function closeOrderModal() { document.getElementById('orderModal').classList.remove('show'); currentOrderId = null; }
+window.closeOrderModal = function () {
+    document.getElementById('orderModal').classList.remove('show');
+    currentOrderId = null;
+};
 
 async function saveOrderChanges() {
     const o = orders.find(x => x.id === currentOrderId);
@@ -174,11 +161,16 @@ async function saveOrderChanges() {
     const newNotes = document.getElementById('orderNotesInput').value;
 
     try {
-        await convexAction('mutation', 'orders:updateStatus', {
-            orderId: currentOrderId,
-            status: newStatus,
-            notes: newNotes
-        });
+        const { error } = await supabase
+            .from('orders')
+            .update({
+                status: newStatus,
+                notes: newNotes
+            })
+            .eq('id', currentOrderId);
+
+        if (error) throw error;
+
         showNotification('Pedido actualizado', 'success');
         closeOrderModal();
         fetchAndRenderOrders();
@@ -195,10 +187,13 @@ window.quickStatus = async function (id) {
     if (idx < flow.length - 1) {
         const nextStatus = flow[idx + 1];
         try {
-            await convexAction('mutation', 'orders:updateStatus', {
-                orderId: id, // Corrected from o.id to id just to be safe, though o.id is same
-                status: nextStatus
-            });
+            const { error } = await supabase
+                .from('orders')
+                .update({ status: nextStatus })
+                .eq('id', id);
+
+            if (error) throw error;
+
             showNotification(`Estado: ${getStatusLabel(nextStatus)}`, 'success');
             fetchAndRenderOrders();
         } catch (error) {
@@ -207,13 +202,26 @@ window.quickStatus = async function (id) {
     }
 };
 
-window.openDeleteModal = function (id) { currentOrderId = id; document.getElementById('deleteModal').classList.add('show'); };
-function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('show'); currentOrderId = null; }
+window.openDeleteModal = function (id) {
+    currentOrderId = id;
+    document.getElementById('deleteModal').classList.add('show');
+};
+
+window.closeDeleteModal = function () {
+    document.getElementById('deleteModal').classList.remove('show');
+    currentOrderId = null;
+};
 
 async function confirmDeleteOrder() {
     if (!currentOrderId) return;
     try {
-        await convexAction('mutation', 'orders:remove', { orderId: currentOrderId });
+        const { error } = await supabase
+            .from('orders')
+            .delete()
+            .eq('id', currentOrderId);
+
+        if (error) throw error;
+
         showNotification('Pedido eliminado', 'success');
         closeDeleteModal();
         fetchAndRenderOrders();

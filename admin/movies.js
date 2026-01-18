@@ -1,33 +1,5 @@
 // ===== Movies Management JavaScript =====
 
-// Convex HTTP Client Helper
-async function convexAction(action, path, args = {}) {
-    const CONVEX_URL = 'http://127.0.0.1:3210';
-    try {
-        const response = await fetch(`${CONVEX_URL}/api/${action}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ path, args }),
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Error en el servidor');
-        }
-
-        const data = await response.json();
-        if (data.status === 'error') {
-            throw new Error(data.errorMessage);
-        }
-        return data.value;
-    } catch (error) {
-        console.error('Convex Error:', error);
-        throw error;
-    }
-}
-
 let movies = [];
 let currentMovieId = null;
 
@@ -46,7 +18,8 @@ function initSidebar() {
 }
 
 function initLogout() {
-    document.getElementById('logoutBtn')?.addEventListener('click', () => {
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+        await supabase.auth.signOut();
         localStorage.clear();
         window.location.href = '../login.html';
     });
@@ -69,7 +42,15 @@ function initEventListeners() {
 
 async function fetchGenres() {
     try {
-        const genres = await convexAction('query', 'movies:getUniqueGenres');
+        const { data, error } = await supabase
+            .from('movies')
+            .select('genre');
+
+        if (error) throw error;
+
+        // Get unique genres
+        const genres = [...new Set(data.map(m => m.genre).filter(Boolean))];
+
         const select = document.getElementById('filterGenre');
         // Clear existing except first (All)
         while (select.options.length > 1) {
@@ -99,11 +80,25 @@ async function fetchAndRenderMovies() {
     const grid = document.getElementById('moviesGrid');
 
     try {
-        movies = await convexAction('query', 'movies:list', {
-            search: search || undefined,
-            genre: genre,
-            isAvailable: isAvailable
-        });
+        let query = supabase.from('movies').select('*');
+
+        if (genre) query = query.eq('genre', genre);
+        if (isAvailable !== undefined) query = query.eq('is_available', isAvailable);
+
+        // Supabase doesn't have a simple "search" for all fields, typically we use ilike on specific columns
+        if (search) {
+            query = query.ilike('title', `%${search}%`);
+        }
+
+        const { data, error } = await query.order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        movies = data.map(m => ({
+            ...m,
+            imageUrl: m.image_url,
+            isAvailable: m.is_available
+        }));
 
         renderMovies(movies);
     } catch (error) {
@@ -131,11 +126,11 @@ function renderMovies(moviesToRender) {
             <div class="movie-info">
                 <h3 title="${escapeHtml(m.title)}">${escapeHtml(m.title)}</h3>
                 <div class="movie-meta">
-                    <span><i class="fas fa-calendar"></i> ${m.year}</span>
-                    <span><i class="fas fa-tag"></i> ${escapeHtml(m.genre)}</span>
+                    <span><i class="fas fa-calendar"></i> ${m.year || '-'}</span>
+                    <span><i class="fas fa-tag"></i> ${escapeHtml(m.genre || 'Sin género')}</span>
                 </div>
                 <div class="movie-qualities">
-                    ${m.qualities.map(q => `<span class="quality-tag">${q.toUpperCase()}</span>`).join('')}
+                    ${(m.qualities || []).map(q => `<span class="quality-tag">${q.toUpperCase()}</span>`).join('')}
                 </div>
                 <div class="movie-actions">
                     <button class="btn-icon edit" onclick="openMovieModal('${m.id}')" title="Editar"><i class="fas fa-edit"></i></button>
@@ -159,12 +154,12 @@ window.openMovieModal = function (id = null) {
         document.getElementById('modalTitle').textContent = 'Editar Película';
         document.getElementById('movieId').value = m.id;
         document.getElementById('movieTitle').value = m.title;
-        document.getElementById('movieYear').value = m.year;
-        document.getElementById('movieGenre').value = m.genre;
+        document.getElementById('movieYear').value = m.year || '';
+        document.getElementById('movieGenre').value = m.genre || '';
         document.getElementById('movieImage').value = m.imageUrl || '';
         document.getElementById('movieAvailable').checked = m.isAvailable;
         document.querySelectorAll('input[name="quality"]').forEach(cb => {
-            cb.checked = m.qualities.includes(cb.value);
+            cb.checked = (m.qualities || []).includes(cb.value);
         });
     } else {
         document.getElementById('modalTitle').textContent = 'Nueva Película';
@@ -190,37 +185,53 @@ async function handleMovieSubmit(e) {
         return;
     }
 
-    const data = {
+    const dataPayload = {
         title: document.getElementById('movieTitle').value.trim(),
-        year: parseInt(document.getElementById('movieYear').value),
+        year: parseInt(document.getElementById('movieYear').value) || null,
         genre: document.getElementById('movieGenre').value.trim(),
-        imageUrl: document.getElementById('movieImage').value.trim(),
-        isAvailable: document.getElementById('movieAvailable').checked,
+        image_url: document.getElementById('movieImage').value.trim(),
+        is_available: document.getElementById('movieAvailable').checked,
         qualities: qualities,
     };
 
     try {
         if (currentMovieId) {
-            await convexAction('mutation', 'movies:update', {
-                movieId: currentMovieId,
-                ...data
-            });
+            const { error } = await supabase
+                .from('movies')
+                .update(dataPayload)
+                .eq('id', currentMovieId);
+
+            if (error) throw error;
             showNotification('Película actualizada', 'success');
         } else {
-            await convexAction('mutation', 'movies:create', data);
+            const { error } = await supabase
+                .from('movies')
+                .insert([dataPayload]);
+
+            if (error) throw error;
             showNotification('Película agregada', 'success');
         }
         closeMovieModal();
         fetchGenres(); // Refresh genres in case a new one was added
         fetchAndRenderMovies();
     } catch (error) {
-        showNotification(error.message, 'error');
+        console.error(error);
+        showNotification(error.message || 'Error al guardar', 'error');
     }
 }
 
 window.toggleAvailability = async function (id) {
     try {
-        await convexAction('mutation', 'movies:toggleAvailability', { movieId: id });
+        const m = movies.find(x => x.id === id);
+        if (!m) return;
+
+        const { error } = await supabase
+            .from('movies')
+            .update({ is_available: !m.isAvailable })
+            .eq('id', id);
+
+        if (error) throw error;
+
         showNotification('Disponibilidad actualizada', 'success');
         fetchAndRenderMovies();
     } catch (error) {
@@ -245,7 +256,13 @@ function closeDeleteModal() {
 async function confirmDeleteMovie() {
     if (!currentMovieId) return;
     try {
-        await convexAction('mutation', 'movies:remove', { movieId: currentMovieId });
+        const { error } = await supabase
+            .from('movies')
+            .delete()
+            .eq('id', currentMovieId);
+
+        if (error) throw error;
+
         showNotification('Película eliminada', 'success');
         closeDeleteModal();
         fetchAndRenderMovies();
