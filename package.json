@@ -4,7 +4,8 @@
   "description": "",
   "main": "login.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite"
   },
   "keywords": [],
   "author": "",
@@ -12,5 +13,8 @@
   "type": "commonjs",
   "dependencies": {
     "convex": "^1.31.5"
+  },
+  "devDependencies": {
+    "vite": "^7.3.1"
   }
 }
