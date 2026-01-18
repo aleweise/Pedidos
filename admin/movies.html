@@ -10,6 +10,61 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="admin.css">
+    <style>
+        .tmdb-results-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            margin-top: 5px;
+        }
+
+        .tmdb-results-dropdown.active {
+            display: block;
+        }
+
+        .tmdb-result-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.2s;
+        }
+
+        .tmdb-result-item:hover {
+            background: rgba(99, 102, 241, 0.2);
+        }
+
+        .tmdb-result-poster {
+            width: 30px;
+            height: 45px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 10px;
+            background: #0f172a;
+        }
+
+        .tmdb-result-info h4 {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #f8fafc;
+        }
+
+        .tmdb-result-info p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+    </style>
 </head>
 
 <body>
@@ -130,6 +185,23 @@
                 <div class="modal-body">
                     <input type="hidden" id="movieId">
 
+                    <!-- TMDB Import Section -->
+                    <div class="form-group"
+                        style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <label style="color: #94a3b8; font-size: 0.9em; margin-bottom: 8px; display: block;">
+                            <i class="fas fa-cloud-download-alt"></i> Importar desde TMDB
+                        </label>
+                        <div style="display: flex; gap: 10px; position: relative;">
+                            <input type="text" id="tmdbSearchInput" placeholder="Buscar título para autocompletar..."
+                                autocomplete="off">
+                            <button type="button" id="tmdbSearchBtn" class="btn-secondary"
+                                style="width: auto; padding: 0 15px;">
+                                <i class="fas fa-search"></i>
+                            </button>
+                            <div id="tmdbSearchResults" class="tmdb-results-dropdown"></div>
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label for="movieTitle">Título</label>
                         <input type="text" id="movieTitle" required>
@@ -208,6 +280,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../utils/supabaseClient.js"></script>
+    <script src="../utils/tmdbClient.js"></script>
     <script src="movies.js"></script>
 </body>
 

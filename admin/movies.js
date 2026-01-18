@@ -56,6 +56,12 @@ function initEventListeners() {
     document.getElementById('cancelModal')?.addEventListener('click', closeMovieModal);
     document.getElementById('movieForm')?.addEventListener('submit', handleMovieSubmit);
 
+    // TMDB Search Listeners
+    document.getElementById('tmdbSearchBtn')?.addEventListener('click', handleTMDBSearch);
+    document.getElementById('tmdbSearchInput')?.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') handleTMDBSearch();
+    });
+
     document.getElementById('closeDeleteModal')?.addEventListener('click', closeDeleteModal);
     document.getElementById('cancelDelete')?.addEventListener('click', closeDeleteModal);
     document.getElementById('confirmDelete')?.addEventListener('click', confirmDeleteMovie);
@@ -300,6 +306,73 @@ function escapeHtml(text) {
     div.textContent = text;
     return div.innerHTML;
 }
+
+// ===== TMDB Search Logic =====
+let currentTMDBResults = []; // Store results globally
+
+async function handleTMDBSearch() {
+    const query = document.getElementById('tmdbSearchInput').value.trim();
+    const resultsContainer = document.getElementById('tmdbSearchResults');
+
+    if (!query) return;
+
+    // Show loading state
+    resultsContainer.innerHTML = '<div style="padding:10px; color:#94a3b8;">Buscando...</div>';
+    resultsContainer.classList.add('active');
+
+    try {
+        const results = await searchMovies(query); // from tmdbClient.js
+        currentTMDBResults = results || [];
+
+        if (!currentTMDBResults || currentTMDBResults.length === 0) {
+            resultsContainer.innerHTML = '<div style="padding:10px; color:#94a3b8;">No se encontraron resultados</div>';
+            return;
+        }
+
+        resultsContainer.innerHTML = currentTMDBResults.slice(0, 5).map((movie, index) => `
+            <div class="tmdb-result-item" onclick="selectTMDBMovie(${index})">
+                <img src="${movie.poster_path ? TMDB_IMAGE_BASE_URL + movie.poster_path : ''}" class="tmdb-result-poster" alt="Poster">
+                <div class="tmdb-result-info">
+                    <h4>${escapeHtml(movie.title)}</h4>
+                    <p>${movie.release_date ? movie.release_date.split('-')[0] : 'N/A'}</p>
+                </div>
+            </div>
+        `).join('');
+
+        // Add click outside listener to close dropdown
+        document.addEventListener('click', function closeDropdown(e) {
+            if (!e.target.closest('.form-group')) {
+                resultsContainer.classList.remove('active');
+                document.removeEventListener('click', closeDropdown);
+            }
+        });
+
+    } catch (error) {
+        console.error('TMDB Search Error:', error);
+        resultsContainer.innerHTML = '<div style="padding:10px; color:#ef4444;">Error al buscar</div>';
+    }
+}
+
+window.selectTMDBMovie = function (index) {
+    try {
+        const movie = currentTMDBResults[index];
+        if (!movie) return;
+
+        document.getElementById('movieTitle').value = movie.title;
+        document.getElementById('movieYear').value = movie.release_date ? movie.release_date.split('-')[0] : '';
+        document.getElementById('movieImage').value = movie.poster_path ? TMDB_IMAGE_BASE_URL + movie.poster_path : '';
+        // Genre is tricky as TMDB gives IDs. Leaving genre as is or maybe "Importado"
+        // document.getElementById('movieGenre').value = "Importado"; 
+
+        document.getElementById('tmdbSearchResults').classList.remove('active');
+        document.getElementById('tmdbSearchInput').value = ''; // clear search
+
+        showNotification('Datos importados de TMDB', 'success');
+
+    } catch (e) {
+        console.error('Error selecting movie', e);
+    }
+};
 
 function showNotification(msg, type = 'info') {
     document.querySelector('.notification')?.remove();
