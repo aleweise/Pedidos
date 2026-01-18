@@ -3,8 +3,40 @@
 document.addEventListener('DOMContentLoaded', () => {
     initPasswordToggle();
     initLoginForm();
+    initForgotPassword();
     initSocialLogin();
 });
+
+// ===== Forgot Password Handler =====
+function initForgotPassword() {
+    const forgotLink = document.querySelector('.forgot-password');
+    if (forgotLink) {
+        forgotLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            const email = prompt('Por favor, ingresa tu correo electrónico para restablecer tu contraseña:');
+
+            if (email) {
+                if (!validateEmail(email)) {
+                    showNotification('Por favor, ingresa un correo válido', 'error');
+                    return;
+                }
+
+                try {
+                    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                        redirectTo: window.location.origin + '/update-password.html'
+                    });
+
+                    if (error) throw error;
+
+                    showNotification('Se ha enviado un correo para restablecer tu contraseña', 'success');
+                } catch (error) {
+                    showNotification(error.message || 'Error al enviar el correo de recuperación', 'error');
+                }
+            }
+        });
+    }
+}
 
 // ===== Password Toggle =====
 function initPasswordToggle() {
