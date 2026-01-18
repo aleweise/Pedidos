@@ -110,6 +110,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // URL Params for Pre-filling (from Catalog)
+    const urlParams = new URLSearchParams(window.location.search);
+    const movieParam = urlParams.get('movie');
+    const yearParam = urlParams.get('year');
+
+    if (movieParam) {
+        const nameInput = document.getElementById('movieName');
+        if (nameInput) nameInput.value = movieParam;
+
+        // Use history API to remove params without refresh
+        const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + window.location.hash;
+        window.history.pushState({ path: newUrl }, '', newUrl);
+    }
+
+    if (yearParam) {
+        const yearInput = document.getElementById('movieYear');
+        if (yearInput && yearParam !== 'N/A') yearInput.value = yearParam;
+    }
+
     // Form Submission Logic
     const form = document.getElementById('movieForm');
 

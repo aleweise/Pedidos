@@ -24,6 +24,36 @@ async function searchMovies(query) {
     }
 }
 
+async function getPopularMovies(page = 1) {
+    try {
+        const response = await fetch(`${TMDB_BASE_URL}/movie/popular?language=es-MX&page=${page}`, {
+            headers: { 'Authorization': `Bearer ${TMDB_API_KEY}`, 'accept': 'application/json' }
+        });
+        if (!response.ok) throw new Error('Error fetching popular movies');
+        const data = await response.json();
+        return data.results || [];
+    } catch (error) {
+        console.error('TMDB Popular Error:', error);
+        return [];
+    }
+}
+
+async function getNowPlaying(page = 1) {
+    try {
+        const response = await fetch(`${TMDB_BASE_URL}/movie/now_playing?language=es-MX&page=${page}`, {
+            headers: { 'Authorization': `Bearer ${TMDB_API_KEY}`, 'accept': 'application/json' }
+        });
+        if (!response.ok) throw new Error('Error fetching now playing movies');
+        const data = await response.json();
+        return data.results || [];
+    } catch (error) {
+        console.error('TMDB Now Playing Error:', error);
+        return [];
+    }
+}
+
 // Export for use in script.js (if using modules) or global window object
 window.searchMovies = searchMovies;
-window.TMDB_IMAGE_BASE_URL = TMDB_IMAGE_BASE_URL;
+window.getPopularMovies = getPopularMovies;
+window.getNowPlaying = getNowPlaying;
+window.TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500'; // Increased size for catalog cards

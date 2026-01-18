@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         switch (status) {
             case 'completed': return 'status-completed';
             case 'cancelled': return 'status-cancelled';
+            case 'in_progress': return 'status-progress';
             default: return 'status-pending';
         }
     }
@@ -100,6 +101,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         switch (status) {
             case 'completed': return 'Completado';
             case 'cancelled': return 'Cancelado';
+            case 'in_progress': return 'En Proceso';
             default: return 'Pendiente';
         }
     }

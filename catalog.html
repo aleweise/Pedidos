@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo - CinePedido</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .catalog-container {
+            padding: 8rem 5% 4rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .catalog-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .catalog-header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .category-filters {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-dim);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .movie-card {
+            background: var(--bg-card);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s;
+            position: relative;
+            border: 1px solid var(--glass-border);
+        }
+
+        .movie-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .movie-poster {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .movie-info {
+            padding: 1rem;
+        }
+
+        .movie-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .movie-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        .rating {
+            color: #fbbf24;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .movie-card:hover .card-overlay {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <i class="fas fa-play-circle"></i> <span>CinePedido</span>
+        </a>
+        <div class="nav-links" id="navLinks">
+            <a href="index.html">Inicio</a>
+            <a href="catalog.html" class="active">Catálogo</a>
+            <a href="my-orders.html">Mis Pedidos</a>
+            <a href="login.html" class="btn-primary" id="authLink"><i class="fas fa-user"></i> Login</a>
+        </div>
+        <div class="burger" id="burger">
+            <i class="fas fa-bars"></i>
+        </div>
+    </nav>
+
+    <div class="catalog-container">
+        <div class="catalog-header">
+            <h1>Explorar Películas</h1>
+            <div class="category-filters">
+                <button class="filter-btn active" onclick="loadMovies('popular')">Populares</button>
+                <button class="filter-btn" onclick="loadMovies('now_playing')">En Cartelera</button>
+            </div>
+        </div>
+
+        <div class="movie-grid" id="movieGrid">
+            <!-- Movies injected here -->
+        </div>
+        <div id="loader" style="text-align: center; margin-top: 2rem; display: none;">
+            <i class="fas fa-spinner fa-spin fa-2x"></i>
+        </div>
+    </div>
+
+    <script src="utils/tmdbClient.js"></script>
+    <script>
+        const grid = document.getElementById('movieGrid');
+        const loader = document.getElementById('loader');
+
+        // Navigation Logic
+        document.getElementById('burger').addEventListener('click', () => {
+            document.getElementById('navLinks').classList.toggle('active');
+        });
+
+        // Auth Check (copy-paste from script.js basic logic)
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (currentUser) {
+            const authLink = document.getElementById('authLink');
+            authLink.innerHTML = `<i class="fas fa-user-circle"></i> ${currentUser.name}`;
+            authLink.href = 'my-orders.html';
+            authLink.classList.remove('btn-primary');
+        }
+
+        // Load Movies
+        async function loadMovies(type = 'popular') {
+            grid.innerHTML = '';
+            loader.style.display = 'block';
+
+            // Update buttons active state
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event ? event.target.classList.add('active') : document.querySelector('.filter-btn').classList.add('active');
+
+            let movies = [];
+            if (type === 'popular') movies = await window.getPopularMovies();
+            if (type === 'now_playing') movies = await window.getNowPlaying();
+
+            loader.style.display = 'none';
+
+            grid.innerHTML = movies.map(movie => {
+                const poster = movie.poster_path
+                    ? `${window.TMDB_IMAGE_BASE_URL}${movie.poster_path}`
+                    : 'https://via.placeholder.com/300x450?text=No+Img';
+
+                const year = movie.release_date ? movie.release_date.split('-')[0] : 'N/A';
+
+                return `
+                    <div class="movie-card">
+                        <img src="${poster}" alt="${movie.title}" class="movie-poster">
+                        <div class="movie-info">
+                            <div class="movie-title" title="${movie.title}">${movie.title}</div>
+                            <div class="movie-meta">
+                                <span>${year}</span>
+                                <div class="rating">
+                                    <i class="fas fa-star"></i> ${movie.vote_average.toFixed(1)}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-overlay">
+                            <button class="btn-primary" onclick="requestMovie('${escapeHtml(movie.title)}', '${year}')">
+                                <i class="fas fa-plus"></i> Pedir
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function requestMovie(title, year) {
+            // Redirect to index with params
+            const params = new URLSearchParams({
+                movie: title,
+                year: year
+            });
+            window.location.href = `index.html?${params.toString()}#movieForm`;
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+        }
+
+        // Initial Load
+        loadMovies('popular');
+    </script>
+</body>
+
+</html>
