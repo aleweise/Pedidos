@@ -149,53 +149,36 @@ function validateEmail(email) {
     return re.test(email);
 }
 
-// Convex HTTP Client Helper
-async function convexAction(action, path, args = {}) {
-    const CONVEX_URL = 'http://127.0.0.1:3210';
-    try {
-        const response = await fetch(`${CONVEX_URL}/api/${action}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ path, args }),
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Error en el servidor');
-        }
-
-        const data = await response.json();
-
-        if (data.status === 'error') {
-            throw new Error(data.errorMessage);
-        }
-        return data.value;
-    } catch (error) {
-        console.error('Convex Error:', error);
-        throw error;
-    }
-}
+// Supabase client is initialized in utils/supabaseClient.js and available as 'supabase' global
 
 async function simulateLogin(email, password) {
-    // Call real Convex mutation: auth:signIn
     try {
-        const result = await convexAction('mutation', 'auth:signIn', {
+        const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password
         });
 
-        // Store session
-        localStorage.setItem('authToken', result.token);
-        localStorage.setItem('currentUser', JSON.stringify(result.user));
+        if (error) {
+            // Human-friendly errors
+            if (error.message.includes('Invalid login')) throw new Error('Credenciales incorrectas');
+            throw error;
+        }
 
-        return { success: true, ...result };
+        // Store session for UI compatibility
+        const user = {
+            id: data.user.id,
+            email: data.user.email,
+            name: data.user.user_metadata.name || email.split('@')[0],
+            role: 'user'
+        };
+
+        localStorage.setItem('authToken', data.session.access_token);
+        localStorage.setItem('currentUser', JSON.stringify(user));
+
+        return { success: true, ...data };
     } catch (error) {
-        // Human-friendly errors
-        if (error.message.includes('inválidas')) throw new Error('Credenciales incorrectas');
-        if (error.message.includes('desactivada')) throw new Error('Tu cuenta está desactivada');
-        throw error;
+        if (error.message.includes('Credenciales incorrectas')) throw error;
+        throw new Error(error.message || 'Error al iniciar sesión');
     }
 }
 

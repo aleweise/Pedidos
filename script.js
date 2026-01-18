@@ -1,30 +1,5 @@
-// Convex HTTP Client Helper
-async function convexAction(action, path, args = {}) {
-    const CONVEX_URL = 'http://127.0.0.1:3210';
-    try {
-        const response = await fetch(`${CONVEX_URL}/api/${action}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ path, args }),
-        });
+// Supabase client is initialized in utils/supabaseClient.js and available as 'supabase' global
 
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Error en el servidor');
-        }
-
-        const data = await response.json();
-        if (data.status === 'error') {
-            throw new Error(data.errorMessage);
-        }
-        return data.value;
-    } catch (error) {
-        console.error('Convex Error:', error);
-        throw error;
-    }
-}
 
 document.addEventListener('DOMContentLoaded', () => {
     // Carousel Logic
@@ -109,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 if (confirm('¿Deseas cerrar sesión?')) {
                     try {
-                        await convexAction('mutation', 'auth:signOut', { token: authToken });
+                        await supabase.auth.signOut();
                     } catch (e) { console.warn('Logout error', e); }
 
                     localStorage.removeItem('authToken');
@@ -146,15 +121,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const audio = document.querySelector('input[name="audio"]:checked').value;
 
             try {
-                // Call real Convex mutation
-                await convexAction('mutation', 'orders:create', {
-                    token: authToken,
-                    movieName: movieName,
-                    movieYear: movieYear,
-                    quality: quality,
-                    audioPreference: audio,
-                    notes: '' // Optional notes
-                });
+                // Call Supabase insert
+                const { data: user } = await supabase.auth.getUser();
+                if (!user || !user.user) throw new Error('Usuario no autenticado');
+
+                const { error } = await supabase.from('orders').insert([
+                    {
+                        user_id: user.user.id,
+                        movie_name: movieName,
+                        movie_year: movieYear || null,
+                        quality: quality,
+                        audio_preference: audio,
+                    }
+                ]);
+
+                if (error) throw error;
 
                 submitBtn.innerHTML = '<i class="fas fa-check"></i> ¡Solicitud Enviada!';
                 submitBtn.style.background = '#10b981'; // Success Green

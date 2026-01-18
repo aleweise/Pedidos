@@ -229,68 +229,44 @@ function validateEmail(email) {
     return re.test(email);
 }
 
-// Convex HTTP Client Helper
-async function convexAction(action, path, args = {}) {
-    const CONVEX_URL = 'http://127.0.0.1:3210';
-    try {
-        const response = await fetch(`${CONVEX_URL}/api/${action}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ path, args }),
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Error en el servidor');
-        }
-
-        const data = await response.json();
-
-        if (data.status === 'error') {
-            throw new Error(data.errorMessage);
-        }
-        return data.value;
-    } catch (error) {
-        console.error('Convex Error:', error);
-        throw error;
-    }
-}
+// Supabase client is initialized in utils/supabaseClient.js and available as 'supabase' global
 
 async function simulateRegister(userData) {
     try {
-        const result = await convexAction('mutation', 'auth:signUp', {
+        const { data, error } = await supabase.auth.signUp({
             email: userData.email,
-            name: `${userData.firstName} ${userData.lastName}`,
             password: userData.password,
-            phone: null // Optional
+            options: {
+                data: {
+                    name: `${userData.firstName} ${userData.lastName}`
+                }
+            }
         });
 
-        // Store session (auto-login after registration)
-        localStorage.setItem('authToken', result.token);
+        if (error) {
+            if (error.message.includes('already registered')) throw new Error('Este correo electrónico ya está registrado');
+            throw error;
+        }
 
-        // Fetch full user details to get role, etc. or just construct from args + result if backend returns minimal
-        // But our auth.signUp returns { userId, token }, not full user object like signIn does in my code ? 
-        // Let's check auth.ts again. signUp returns { userId, token }. 
-        // signIn returns { token, user: { ... } }.
-        // So for signUp, I should probably construct the user object locally or fetch it.
-        // Or simpler: I'll just assume role 'user' and store basic info.
+        if (!data.session) {
+            // Email confirmation required
+            throw new Error('Registro exitoso. Por favor revisa tu correo para confirmar la cuenta.');
+        }
+
+        // Store session (auto-login after registration)
+        localStorage.setItem('authToken', data.session.access_token);
 
         const user = {
-            id: result.userId,
-            email: userData.email,
-            name: `${userData.firstName} ${userData.lastName}`,
+            id: data.user.id,
+            email: data.user.email,
+            name: data.user.user_metadata.name,
             role: 'user'
         };
         localStorage.setItem('currentUser', JSON.stringify(user));
 
-        return { success: true, user, token: result.token };
+        return { success: true, user, token: data.session.access_token };
 
     } catch (error) {
-        if (error.message.includes('ya registrado') || error.message.includes('unique constraint')) {
-            throw new Error('Este correo electrónico ya está registrado');
-        }
         throw error;
     }
 }
