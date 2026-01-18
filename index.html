@@ -83,7 +83,8 @@
                     <form id="movieForm" class="glass-form">
                         <div class="input-group">
                             <label for="movieName"><i class="fas fa-film"></i> Nombre de la Película</label>
-                            <input type="text" id="movieName" placeholder="Ej: Avatar 2" required>
+                            <input type="text" id="movieName" placeholder="Ej: Avatar 2" required autocomplete="off">
+                            <div id="suggestions" class="suggestions-container"></div>
                         </div>
 
                         <div class="row">
@@ -138,6 +139,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="utils/supabaseClient.js"></script>
+    <script src="utils/tmdbClient.js"></script>
     <script src="script.js"></script>
 </body>
 

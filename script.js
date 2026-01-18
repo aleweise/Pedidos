@@ -177,6 +177,71 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    // TMDB Autocomplete Logic
+    const movieInput = document.getElementById('movieName');
+    const suggestionsBox = document.getElementById('suggestions');
+    const yearInput = document.getElementById('movieYear');
+
+    if (movieInput && suggestionsBox) {
+        let debounceTimer;
+
+        movieInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            clearTimeout(debounceTimer);
+
+            if (query.length < 2) {
+                suggestionsBox.classList.remove('active');
+                return;
+            }
+
+            debounceTimer = setTimeout(async () => {
+                const results = await window.searchMovies(query);
+                renderSuggestions(results);
+            }, 300);
+        });
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!movieInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                suggestionsBox.classList.remove('active');
+            }
+        });
+
+        function renderSuggestions(movies) {
+            if (movies.length === 0) {
+                suggestionsBox.classList.remove('active');
+                return;
+            }
+
+            suggestionsBox.innerHTML = movies.slice(0, 5).map(movie => {
+                const poster = movie.poster_path
+                    ? `${window.TMDB_IMAGE_BASE_URL}${movie.poster_path}`
+                    : 'https://via.placeholder.com/40x60?text=No+Img';
+
+                const year = movie.release_date ? movie.release_date.split('-')[0] : 'N/A';
+
+                return `
+                    <div class="suggestion-item" onclick="selectMovie('${escapeHtml(movie.title)}', '${year}')">
+                        <img src="${poster}" alt="${escapeHtml(movie.title)}" class="suggestion-poster">
+                        <div class="suggestion-info">
+                            <h4>${escapeHtml(movie.title)}</h4>
+                            <p>${year}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            suggestionsBox.classList.add('active');
+        }
+
+        window.selectMovie = function (title, year) {
+            movieInput.value = title;
+            if (year && year !== 'N/A' && yearInput) {
+                yearInput.value = year;
+            }
+            suggestionsBox.classList.remove('active');
+        };
+    }
 });
 
 function escapeHtml(text) {
