@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Pedidos - CinePedido</title>
+    <meta name="description" content="Revisa el historial de tus solicitudes de películas.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .orders-container {
+            padding: 8rem 2rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        .orders-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #fff;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        th {
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background: rgba(251, 191, 36, 0.2);
+            color: #f59e0b;
+        }
+
+        .status-completed {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .status-cancelled {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="glass-nav">
+        <div class="nav-content">
+            <a href="index.html" class="logo">
+                <i class="fas fa-play-circle"></i>
+                <span>CinePedido</span>
+            </a>
+
+            <div class="nav-links" id="navLinks">
+                <a href="index.html">Inicio</a>
+                <a href="index.html#catalogo">Catálogo</a>
+                <a href="#" class="active">Mis Pedidos</a>
+                <a href="login.html" class="btn-primary">
+                    <i class="fas fa-user"></i> Iniciar Sesión
+                </a>
+            </div>
+
+            <div class="burger" id="burger">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <div class="orders-container">
+        <div class="orders-header">
+            <h1>Mis Pedidos</h1>
+            <a href="index.html#request-form" class="btn-primary"
+                style="padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 12px;">
+                <i class="fas fa-plus"></i> Nuevo Pedido
+            </a>
+        </div>
+
+        <div class="glass-card">
+            <div class="table-responsive">
+                <table id="ordersTable">
+                    <thead>
+                        <tr>
+                            <th>Película</th>
+                            <th>Año</th>
+                            <th>Calidad</th>
+                            <th>Audio</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody">
+                        <tr>
+                            <td colspan="6" class="text-center" style="padding: 2rem;">
+                                <i class="fas fa-spinner fa-spin"></i> Cargando pedidos...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="utils/supabaseClient.js"></script>
+    <script src="script.js"></script>
+    <script src="my-orders.js"></script>
+</body>
+
+</html>

@@ -76,22 +76,37 @@ document.addEventListener('DOMContentLoaded', () => {
         // User is logged in
         if (authLink) {
             authLink.innerHTML = `<i class="fas fa-user-circle"></i> ${escapeHtml(currentUser.name)}`;
-            authLink.href = '#';
+            authLink.href = 'my-orders.html'; // Go to orders page
             authLink.classList.remove('btn-primary');
 
-            // Handle logout
-            authLink.addEventListener('click', async (e) => {
-                e.preventDefault();
-                if (confirm('¿Deseas cerrar sesión?')) {
-                    try {
-                        await supabase.auth.signOut();
-                    } catch (e) { console.warn('Logout error', e); }
+            // Create a separate logout button in the menu if possible, 
+            // OR finding the closest container to append a logout link.
+            // For now, let's just create a logout link next to it if we are in the navLinks container
 
-                    localStorage.removeItem('authToken');
-                    localStorage.removeItem('currentUser');
-                    window.location.reload();
-                }
-            });
+            // Check if we haven't already added a logout button
+            if (!document.getElementById('logoutBtn')) {
+                const logoutBtn = document.createElement('a');
+                logoutBtn.id = 'logoutBtn';
+                logoutBtn.href = '#';
+                logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i>';
+                logoutBtn.title = 'Cerrar Sesión';
+                logoutBtn.style.marginLeft = '10px';
+
+                logoutBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    if (confirm('¿Deseas cerrar sesión?')) {
+                        try {
+                            await supabase.auth.signOut();
+                        } catch (e) { console.warn('Logout error', e); }
+
+                        localStorage.removeItem('authToken');
+                        localStorage.removeItem('currentUser');
+                        window.location.href = 'index.html';
+                    }
+                });
+
+                authLink.parentNode.insertBefore(logoutBtn, authLink.nextSibling);
+            }
         }
     }
 
