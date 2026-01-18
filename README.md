@@ -2,7 +2,7 @@
 
 ![Status](https://img.shields.io/badge/Status-Development-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
-![Version](https://img.shields.io/badge/Version-1.0.0-orange)
+![Version](https://img.shields.io/badge/Version-1.1.0-orange)
 
 **CinePedido** es una plataforma web moderna que permite a los usuarios solicitar sus películas favoritas en la mejor calidad (4K, 1080p, 720p). Con una interfaz elegante y un sistema de gestión robusto, conecta a los amantes del cine con el contenido que desean.
 
@@ -11,7 +11,8 @@
 ## ✨ Características Principales
 
 - **🎨 Diseño Premium:** Interfaz de usuario moderna con efectos de vidrio (Glassmorphism), animaciones fluidas y modo oscuro.
-- **🔐 Autenticación Segura:** Registro e inicio de sesión de usuarios gestionado con Convex.
+- **🔐 Autenticación Segura:** Registro e inicio de sesión gestionado con **Supabase Auth**.
+- **🔄 Recuperación de Contraseña:** Sistema integrado de restablecimiento de contraseña vía email.
 - **📝 Gestión de Pedidos:** Los usuarios pueden solicitar películas especificando año, calidad y preferencia de audio.
 - **🛠️ Panel de Administración:**
   - Gestión de **Películas**: Agregar, editar y filtrar por género/disponibilidad.
@@ -24,7 +25,8 @@
 Este proyecto está construido con un stack moderno y eficiente:
 
 - **Frontend:** HTML5, CSS3 (Vanilla con variables CSS), JavaScript (ES6+).
-- **Backend:** [Convex](https://www.convex.dev/) (Backend-as-a-Service para base de datos y funciones en tiempo real).
+- **Backend & Auth:** [Supabase](https://supabase.com/).
+- **Tooling:** [Vite](https://vitejs.dev/) para desarrollo local rápido.
 - **Tipografía:** [Outfit](https://fonts.google.com/specimen/Outfit) (Google Fonts).
 - **Iconos:** [Font Awesome](https://fontawesome.com/).
 
@@ -45,15 +47,16 @@ Sigue estos pasos para correr el proyecto localmente:
     npm install
     ```
 
-3. **Configurar Convex:**
-    Asegúrate de tener una cuenta en Convex y configura tu proyecto.
+3. **Configurar Variables de Entorno (Opcional):**
+    El proyecto ya incluye la configuración de conexión en `utils/supabaseClient.js`, pero para producción deberías usar variables de entorno.
+
+4. **Ejecutar servidor de desarrollo:**
 
     ```bash
-    npx convex dev
+    npm run dev
     ```
 
-4. **Ejecutar:**
-    Abre `index.html` en tu navegador o usa una extensión como *Live Server*.
+    Esto iniciará el servidor (usualmente en `http://localhost:5173`).
 
 ## 🐳 Docker
 
